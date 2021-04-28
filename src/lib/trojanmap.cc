@@ -943,7 +943,7 @@ std::vector<std::string> TrojanMap::DeliveringTrojan(std::vector<std::string> &l
     DFS(root, visited, result, edge_map);
   }
   std::reverse(result.begin(), result.end());
-  PlotPointsOrder(result);
+  // PlotPointsOrder(result); // I comment this plot function to avoid the openCV error 
   return result;                                                     
 }
 
@@ -956,18 +956,33 @@ std::vector<std::string> TrojanMap::DeliveringTrojan(std::vector<std::string> &l
  */
 std::pair<double, std::vector<std::vector<std::string>>> TrojanMap::TravellingTrojan(std::vector<std::string> &location_ids) {
   std::pair<double, std::vector<std::vector<std::string>>> results;
-  double min_path = DBL_MAX;
-  std::sort(location_ids.begin(), location_ids.end());
+  double min_length = DBL_MAX;
+  std::vector<std::string> temp;
+  // Create a vector to save current path ids
+  std::vector<std::string> cur_path;
+  temp.assign(location_ids.begin() + 1, location_ids.end());
+  std::sort(temp.begin(), temp.end());
   // Do permutations of the vector of location ids.
-  while(next_permutation(location_ids.begin(), location_ids.end())){
-		double cur_path = CalculatePathLength(location_ids);
-    if(cur_path < min_path){
-      min_path = cur_path;
-      results.first = min_path;
-      results.second.push_back(location_ids);
-      results.second[results.second.size()-1].push_back(location_ids[0]);
+  do {
+    cur_path.push_back(location_ids[0]);
+    for(auto id: temp){
+      cur_path.push_back(id);
     }
-	}
+    cur_path.push_back(location_ids[0]);
+		double cur_length = CalculatePathLength(cur_path);
+    cur_path.clear();
+    if(cur_length < min_length){
+      min_length = cur_length;
+      results.first = min_length;
+      std::vector<std::string> path;
+      path.push_back(location_ids[0]);
+      for(auto id: temp){
+        path.push_back(id);
+      }
+      path.push_back(location_ids[0]);
+      results.second.push_back(path);
+    }
+	} while(next_permutation(temp.begin(), temp.end()));
   return results;
 }
 
@@ -983,6 +998,7 @@ std::pair<double, std::vector<std::vector<std::string>>> TrojanMap::TravellingTr
   cur_route.push_back(location_ids[0]);
   bool improved = true;
   int nums = location_ids.size();
+  // Do 2opt swap until there is no improvement
   while(improved){
     start_again:
     improved = false;
@@ -994,7 +1010,7 @@ std::pair<double, std::vector<std::vector<std::string>>> TrojanMap::TravellingTr
         if(new_path < cur_path){
           cur_route = new_route;
           cur_path = new_path;
-          // update
+          // update the result
           results.first = cur_path;
           results.second.push_back(cur_route);
           improved = true;
@@ -1059,13 +1075,13 @@ bool TrojanMap::CycleDetection(std::vector<double> &square) {
       bool cycle = hasCycle(id, parent, visited, cycle_path);
       // If there is a cycle, plot it.
       if(cycle){
-        // PLot cycle
-        PlotPath(cycle_path);
+        // If there is a cycle, plot it.
+        // PlotPath(cycle_path); // I comment this plot function to avoid the openCV error 
         return true;
       }
     }
   }
-  // If there is no circle, plot the square
-  PlotPointsandEdges(location_ids, square);
+  // If there is no circle, plot the square and nodes inside the square.
+  // PlotPointsandEdges(location_ids, square); // I comment this plot function to avoid the openCV error 
   return false;
 }
