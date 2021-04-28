@@ -130,6 +130,8 @@ class TrojanMap {
   bool CycleDetection(std::vector<double> &square);
   
   //----------------------------------------------------- User-defined functions
+
+  bool hasCycle(std::string cur, std::string parent, std::map<std::string, bool> &visited, std::vector<std::string> &cycle_path);
 };
 
 #endif
