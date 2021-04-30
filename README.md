@@ -1,20 +1,12 @@
 # EE599 Final Project - Spring 2021 - TrojanMap
 
-## Deadline: 
-
-Video Presentation: Wednesday, April 28 by 23:59 pm
-
-Code submission: Friday, April 30 by 23:59 pm
+## Author: Tianhong Qi
 
 ## TrojanMap
 
 This project focuses on using data structures in C++ and implementing various graph algorithms to build a map application.
 
-<p align="center"><img src="img/TrojanMap.png" alt="Trojan" width="500" /></p>
-
-- Please clone the repository, look through [README.md](README.md) and fill up functions to finish in the project.
-- Please make sure that your code can run `bazel run/test`.
-- In this project, you will need to fill up [trojanmap.cc](src/lib/trojanmap.cc) and add unit tests in the `tests` directory.
+<p align="center"><img src="img/TrojanMap.png" alt="Trojan" width="550" /></p>
 
 ---
 
@@ -33,77 +25,8 @@ class Node {
         neighbors;  // List of the ids of all neighbor points.
 };
 
-```
-
----
-
-## Prerequisites
-
-### OpenCV Installation
-
-For visualization, we use OpenCV library. You will use this library as a black box and don't need to worry about the graphic details.
-
-Use the following commands to install OpenCV.
-
-```shell
-$ cd 2021Spring_TrojanMap
-$ git clone https://github.com/opencv/opencv.git
-```
-
-### Other library Installations
-
-For Ubuntu:
-```shell
-$ sudo apt-get install cmake libgtk2.0-dev pkg-config
-$ sudo apt install libcanberra-gtk-module libcanberra-gtk3-module
-$ sudo apt-get install libncurses5-dev libncursesw5-dev
-$ cp ubuntu/* ./
-```
-
-For MacOS:
-```shell
-$ brew install cmake
-$ brew install ncurses
-```
-
-Next, type the following, but make sure that you set the **path_to_install_folder** to be the absolute path to the install folder under opencv.
-
-```shell
-$ cd opencv/
-$ mkdir build install
-$ cd build
-$ cmake -D CMAKE_INSTALL_PREFIX=**path_to_install_folder**\
- -D BUILD_LIST=core,highgui,imgcodecs,imgproc,videoio\
- -D WITH_TBB=ON -D WITH_OPENMP=ON -D WITH_IPP=ON\
- -D CMAKE_BUILD_TYPE=RELEASE -D BUILD_EXAMPLES=OFF\
- -D WITH_NVCUVID=ON\
- -D WITH_CUDA=ON\
- -D BUILD_DOCS=OFF\
- -D BUILD_PERF_TESTS=OFF\
- -D BUILD_TESTS=OFF\
- -D WITH_CSTRIPES=ON\
- -D WITH_OPENCL=ON ..
-$ make install
-```
-
-For example, if cloned this repo under "/Users/ari/github/TrojanMap", you should type:
-
-```shell
-$ cd opencv/
-$ mkdir build install
-$ cd build
-$ cmake -D CMAKE_INSTALL_PREFIX=/Users/ari/github/TrojanMap/opencv/install\
- -D BUILD_LIST=core,highgui,imgcodecs,imgproc,videoio\
- -D WITH_TBB=ON -D WITH_OPENMP=ON -D WITH_IPP=ON\
- -D CMAKE_BUILD_TYPE=RELEASE -D BUILD_EXAMPLES=OFF\
- -D WITH_NVCUVID=ON\
- -D WITH_CUDA=ON\
- -D BUILD_DOCS=OFF\
- -D BUILD_PERF_TESTS=OFF\
- -D BUILD_TESTS=OFF\
- -D WITH_CSTRIPES=ON\
- -D WITH_OPENCL=ON ..
-$ make install
+   // A map of ids to Nodes.
+  std::map<std::string, Node> data;
 ```
 
 ---
@@ -121,88 +44,109 @@ If everything is correct, this menu will show up.
 ```shell
 Torjan Map
 **************************************************************
-* Select the function you want to execute.
-* 1. Autocomplete
-* 2. Find the position
-* 3. CalculateShortestPath
-* 4. Travelling salesman problem
-* 5. Cycle Detection
-* 6. Topological Sort
-* 7. Exit
+* Select the function you want to execute.                  
+* 1. Autocomplete                                             
+* 2. Find the position                                        
+* 3. CalculateShortestPath(Dijkstra)                          
+* 4. CalculateShortestPath(Bellman_Ford)                      
+* 5. Travelling salesman problem(Brute Force)                 
+* 6. Travelling salesman problem(2opt)                        
+* 7. Cycle Detection                                          
+* 8. Topological Sort                                         
+* 9. Exit 
 **************************************************************
-Please select 1 - 7:
+Please select 1 - 9:
 ```
 
 ## Test the program
 
-We created some tests for you to test your program, please run
+To use the tests created by professor and TAs to test my program, please run
 ```shell
 $ bazel test tests:trojanmap_test
 ```
 
-Please add you test in the [trojanmap_test_student.cc](tests/trojanmap_test_student.cc) and run
+To use the tests created by myself to test my program, please run
 
 ```shell
 $ bazel test tests:trojanmap_test_student
 ```
 
-## First task is to implement a function for each menu item
+## Details for my implementation:
 
 ## Step 1: Autocomplete the location name
 
 ```c++
+/**
+ * Autocomplete: Given a parital name return all the possible locations with
+ * partial name as the prefix.
+ *
+ * @param  {std::string} name          : partial name
+ * @return {std::vector<std::string>}  : a vector of full names
+ */
 std::vector<std::string> Autocomplete(std::string name);
 ```
 
-We consider the names of nodes as the locations. Implement a method to type the partial name of the location and return a list of possible locations with partial name as prefix. Please treat uppercase and lower case as the same character.
+ I implement a method to type the partial name of the location and return a list of possible locations with partial name as prefix. I treat uppercase and lower case as the same character.
 
-Example:
+<p align="center"><img src="img/step1.PNG" alt="step1" width="550" /></p>
 
-Input: "ch" \
-Output: ["ChickfilA", "Chipotle Mexican Grill"]
+Time complexity: **O(n)**, n is the number of location ids in the data.
 
-Input: "ta" \
-Output: ["Target", "Tap Two Blue"]
+Examples:
 
 ```shell
 1
 **************************************************************
 * 1. Autocomplete                                             
 **************************************************************
-
-Please input a partial location:ch
+Please input a partial location:sai
 *************************Results******************************
-ChickfilA
-Chipotle Mexican Grill
+Saint James Park
+Saint Agnes Elementary School
+Saint Marks Lutheran Church
 **************************************************************
-Time taken by function: 1904 microseconds
+Time taken by function: 1694 microseconds
+
+1
+**************************************************************
+* 1. Autocomplete                                             
+**************************************************************
+Please input a partial location:sA
+*************************Results******************************
+Saint James Park
+Saint Agnes Elementary School
+Saint Marks Lutheran Church
+**************************************************************
+Time taken by function: 1582 microseconds
 ```
+
+
 
 ## Step 2: Find the place's Coordinates in the Map
 
 ```c++
+/**
+ * GetPosition: Given a location name, return the position.
+ *
+ * @param  {std::string} name          : location name
+ * @return {std::pair<double,double>}  : (lat, lon)
+ */
 std::pair<double, double> GetPosition(std::string name);
 ```
 
-Given a location name, return the latitude and longitude. There are no duplicated location names. You should mark the given locations on the map. If the location does not exist, return (-1, -1).
+ There are no duplicated location names. I mark the given locations on the map. If the location does not exist, return (-1, -1).
+
+<p align="center"><img src="img/step2.PNG" alt="step2" width="550" /></p>
+
+Time complexity: **O(n)**, n is the number of location ids in the data.
 
 Example:
-
-Input: "ChickfilA" \
-Output: (34.0167334, -118.2825307)
-
-Input: "Ralphs" \
-Output: (34.0317653, -118.2908339)
-
-Input: "Target" \
-Output: (34.0257016, -118.2843512)
 
 ```shell
 2
 **************************************************************
 * 2. Find the position                                        
 **************************************************************
-
 Please input a location:Target
 *************************Results******************************
 Latitude: 34.0257 Longitude: -118.284
@@ -210,127 +154,424 @@ Latitude: 34.0257 Longitude: -118.284
 Time taken by function: 1215 microseconds
 ```
 
-<p align="center"><img src="img/Target.png" alt="Target" width="500"/></p>
+<p align="center"><img src="img/Target.png" alt="Target" width="550"/></p>
+
+```shell
+2
+**************************************************************
+* 2. Find the position                                        
+**************************************************************
+Please input a location:ChickfilA
+*************************Results******************************
+Latitude: 34.0167 Longitude: -118.283
+**************************************************************
+Time taken by function: 1866 microseconds
+```
+
+<p align="center"><img src="img/ChickfilA.PNG" alt="ChickfilA" width="550"/></p>
 
 ## Step 3: CalculateShortestPath between two places
 
 ```c++
+/**
+ * CalculateShortestPath_Dijkstra: Given 2 locations, return the shortest path which is a
+ * list of id.
+ *
+ * @param  {std::string} location1_name     : start
+ * @param  {std::string} location2_name     : goal
+ * @return {std::vector<std::string>}       : path
+ */
 std::vector<std::string> CalculateShortestPath_Dijkstra(std::string &location1_name,
                                                std::string &location2_name);
 std::vector<std::string> CalculateShortestPath_Bellman_Ford(std::string &location1_name,
                                                std::string &location2_name);
 ```
 
-Given 2 locations A and B, find the best route from A to B. The distance between 2 points is the euclidean distance using latitude and longitude. You should use both Dijkstra algorithm and Bellman-Ford algorithm. Compare the time for the different methods. Show the routes on the map. If there is no path, please return empty vector.
+The distance between 2 points is the euclidean distance using latitude and longitude. I implement both Dijkstra algorithm and Bellman-Ford algorithm. Compare the time for the different methods. Show the routes on the map. If there is no path, return empty vector.
 
-Please report and compare the time spent by these 2 algorithms.
+**Dijkstra**
 
-Example:
+<p align="center"><img src="img/step3.PNG" alt="step3" width="550" /></p>
 
-Input: "Ralphs", "ChickfilA" \
-Output: ["2578244375", "5559640911", "6787470571", "6808093910", "6808093913", "6808093919", "6816831441",
-      "6813405269", "6816193784", "6389467806", "6816193783", "123178876", "2613117895", "122719259",
-      "2613117861", "6817230316", "3642819026", "6817230310", "7811699597", "5565967545", "123318572",
-      "6813405206", "6813379482", "544672028", "21306059", "6813379476", "6818390140", "63068610", 
-      "6818390143", "7434941012", "4015423966", "5690152766", "6813379440", "6813379466", "21306060",
-      "6813379469", "6813379427", "123005255", "6807200376", "6807200380", "6813379451", "6813379463",
-      "123327639", "6813379460", "4141790922", "4015423963", "1286136447", "1286136422", "4015423962",
-      "6813379494", "63068643", "6813379496", "123241977", "4015372479", "4015372477", "1732243576",
-      "6813379548", "4015372476", "4015372474", "4015372468", "4015372463", "6819179749", "1732243544",
-      "6813405275", "348121996", "348121864", "6813405280", "1472141024", "6813411590", "216155217", 
-      "6813411589", "1837212103", "1837212101", "6820935911", "4547476733"]
+Time complexity: **O( n+m*log(m) )**, n is the number of location ids in the data, m is the number of edges.
 
 ```shell
 3
 **************************************************************
-* 3. CalculateShortestPath
+* 3. CalculateShortestPath(Dijkstra)                          
 **************************************************************
-
-Please input the start location:Ralphs
-Please input the destination:ChickfilA
+Please input the start location:University Park
+Please input the destination:Subway
 *************************Results******************************
-The distance of the path is:1.53852 miles
+7360410739
+122719216
+6813405232
+4015372486
+7071032399
+4015372485
+6813379479
+5237381975
+6813379481
+7204030702
+4015372484
+6813379430
+6813379429
+544671955
+21306061
+6813379428
+6813416122
+544671962
+21306060
+6813379469
+6813379427
+123005255
+6807200376
+6807200380
+6813379451
+6813379463
+123327639
+6813379460
+4141790922
+4015423963
+1286136447
+1286136422
+4015423962
+6813379494
+63068643
+6813379496
+123241977
+4015372479
+4015372477
+1732243576
+6813379548
+4015372476
+4015372474
+4015372468
+4015372463
+6819179749
+1732243544
+6813405275
+348121996
+348121864
+6813405280
+1472141024
+6813411590
+216155217
+6813411589
+1837212103
+1837212101
+6820935911
+932416162
+4060015482
+4020099365
+6820972450
+1732243549
+6820972451
+122436252
+1836105028
+4060015481
+4020099358
+6814990127
+7867091027
+7867091030
+6226313827
+932378219
+6814990112
+1870795293
+6814990128
+4060015480
+1870795287
+4020099348
+1870795282
+1870787389
+1870795272
+1870795261
+1870795259
+1855150081
+1759017530
+The distance of the path is:1.2865 miles
 **************************************************************
-Time taken by function: 45149 microseconds
+Time taken by function: 44174 microseconds
 ```
 
-<p align="center"><img src="img/Routing.png" alt="Routing" width="500"/></p>
+**Bellman_Ford**
 
-## Step 4: The Travelling Trojan Problem (AKA Traveling Salesman!)
+<p align="center"><img src="img/step3-2.PNG" alt="step3-2" width="550" /></p>
 
-In this section, we assume that a complete graph is given to you. That means each node is a neighbor of all other nodes.
-Given a vector of location ids, assume every location can reach all other locations in the vector (i.e. assume that the vector of location ids is a complete graph).
-Find the shortest route that covers all the locations exactly once and goes back to the start point. 
-
-You will need to return the progress to get the shortest route which will then be converted to an animation.  
-
-We will use the following algorithms:
-
-- Brute Force Method
-```c++
-std::pair<double, std::vector<std::vector<std::string>>> TravellingTrojan(
-      std::vector<std::string> &location_ids);
-```
-- [2-opt Heuristic](https://en.wikipedia.org/wiki/2-opt). Also see [this paper](http://cs.indstate.edu/~zeeshan/aman.pdf)
-```c++
-std::pair<double, std::vector<std::vector<std::string>>> TravellingTrojan_2opt(
-      std::vector<std::string> &location_ids);
-```
-
-Please report and compare the time spent by these 2 algorithms. 2-opt algorithm may not get the optimal solution. Please show how far your solution is from the optimal solution.
-
-Show the routes on the map. For each intermediate solution, create a new plot. Your final video presentation should include the changes to your solution.
-
-We will randomly select N points in the map and run your program.
+Time complexity: **O( m * n )**, n is the number of location ids in the data, m is the number of edges.
 
 ```shell
 4
 **************************************************************
-* 4. Travelling salesman problem                              
+* 4. CalculateShortestPath(Bellman_Ford)                      
 **************************************************************
+Please input the start location:University Park
+Please input the destination:Subway
+*************************Results******************************
+7360410739
+122719216
+6813405232
+4015372486
+7071032399
+4015372485
+6813379479
+5237381975
+6813379481
+7204030702
+4015372484
+6813379430
+6813379429
+544671955
+21306061
+6813379428
+6813416122
+544671962
+21306060
+6813379469
+6813379427
+123005255
+6807200376
+6807200380
+6813379451
+6813379463
+123327639
+6813379460
+4141790922
+4015423963
+1286136447
+1286136422
+4015423962
+6813379494
+63068643
+6813379496
+123241977
+4015372479
+4015372477
+1732243576
+6813379548
+4015372476
+4015372474
+4015372468
+4015372463
+6819179749
+1732243544
+6813405275
+348121996
+348121864
+6813405280
+1472141024
+6813411590
+216155217
+6813411589
+1837212103
+1837212101
+6820935911
+932416162
+4060015482
+4020099365
+6820972450
+1732243549
+6820972451
+122436252
+1836105028
+4060015481
+4020099358
+6814990127
+7867091027
+7867091030
+6226313827
+932378219
+6814990112
+1870795293
+6814990128
+4060015480
+1870795287
+4020099348
+1870795282
+1870787389
+1870795272
+1870795261
+1870795259
+1855150081
+1759017530
+The distance of the path is:1.2865 miles
+**************************************************************
+Time taken by function: 54182428 microseconds
+```
 
+**My Route:**
+
+<p align="center"><img src="img/Routing.PNG" alt="Routing" width="550"/></p>
+
+**Google Map's Route**:
+
+<p align="center"><img src="img/Grouting.PNG" alt="Google map" width="550"/></p>
+
+**Conclusion**:  My route is very similar to google map's route, so I successfully implemented these two algorithms. In addition, the optimized version ( based on priority queue ) Dijkstra algorithm has the lower time complexity, which is also more efficient than bellman-ford algorithm. 
+
+## Step 4: The Travelling Trojan Problem (AKA Traveling Salesman!)
+
+In this section, a complete graph is given to me. That means each node is a neighbor of all other nodes.
+Given a vector of location ids, assume every location can reach all other locations in the vector (i.e. assume that the vector of location ids is a complete graph).
+Find the shortest route that covers all the locations exactly once and goes back to the start point.
+
+I implemented the following two algorithms:
+
+- Brute Force Method
+- [2-opt Heuristic](https://en.wikipedia.org/wiki/2-opt). Also see [this paper](http://cs.indstate.edu/~zeeshan/aman.pdf)
+```c++
+/**
+ * Travelling salesman problem: Given a list of locations, return the shortest
+ * path which visit all the places and back to the start point.
+ *
+ * @param  {std::vector<std::string>} input : a list of locations needs to visit
+ * @return {std::pair<double, std::vector<std::vector<std::string>>} : a pair of total distance and the all 	the progress to get final path
+ */
+std::pair<double, std::vector<std::vector<std::string>>> TravellingTrojan(
+      std::vector<std::string> &location_ids);
+std::pair<double, std::vector<std::vector<std::string>>> TravellingTrojan_2opt(
+      std::vector<std::string> &location_ids);
+```
+**Brute Force Method**:
+
+<p align="center"><img src="img/step4-1.PNG" alt="step4-1" width="550"/></p>
+
+Time complexity: **O(n!)**, n is the number of location ids.
+
+```shell
+5
+**************************************************************
+* 5. Travelling salesman problem(Brute Force)                 
+**************************************************************
 In this task, we will select N random points on the map and you need to find the path to travel these points and back to the start point.
 
 Please input the number of the places:10
 Calculating ...
 *************************Results******************************
-The distance of the path is:4.70299 miles
+6805295626
+4583266241
+6813379493
+368173251
+6818460814
+6807241418
+4015477530
+4399914044
+6788057222
+6474130386
+6805295626
+**************************************************************
+The distance of the path is:4.29791 miles
 **************************************************************
 You could find your animation at src/lib/output.avi.          
-Time taken by function: 152517394 microseconds
+Time taken by function: 9377598 microseconds
 ```
 
-<p align="center"><img src="img/TSP.png" alt="TSP" width="500"/></p>
+<p align="center"><img src="img/TSP.png" alt="PNG" width="550"/></p>
 
-<p align="center"><img src="img/output.gif" alt="TSP videos" width="500"/></p>
+<p align="center"><img src="img/TSP.gif" alt="TSP video1" width="550"/></p>
+
+**2-opt Heuristic**:
+
+<p align="center"><img src="img/step4-2.PNG" alt="step4-2" width="550"/></p>
+
+Time complexity: **O(n^2)**, n is the number of location ids.
+
+```shell
+6
+**************************************************************
+* 6. Travelling salesman problem(2opt)                        
+**************************************************************
+
+In this task, we will select N random points on the map and you need to find the path to travel these points and back to the start point.
+
+Please input the number of the places:30
+Calculating ...
+*************************Results******************************
+5768963649
+6790463796
+1790748077
+33078883
+4012792179
+4399914037
+123292049
+6820982886
+269635544
+269633281
+4015372463
+354062976
+269635105
+5768963637
+5768963620
+6817197864
+6807241418
+4835549595
+1732340067
+2613117900
+2613117900
+6816822864
+7882624618
+6047202831
+1849116069
+6816831441
+5541796228
+6805827713
+933924387
+1855145672
+5768963649
+**************************************************************
+The distance of the path is:6.88329 miles
+**************************************************************
+You could find your animation at src/lib/output.avi.          
+Time taken by function: 471072 microseconds
+```
+
+<p align="center"><img src="img/TSP2.PNG" alt="TSP2" width="550"/></p>
+
+<p align="center"><img src="img/TSP2.gif" alt="TSP video2" width="550"/></p>
+
+**Conclusion**:  According to the above examples, we can see that my 2opt algorithm has a good performance. In most cases, my 2opt algorithm can calculate the optimal solution. I use 30 points as an example to test my 2opt method, while only 10 points to test my brute-force method, the time complexity of 2opt is much less than brute-force. With the number of input increasing, the brute-force method performs increasingly terrible. 
 
 ## Step 5: Cycle Detection
 
 ```c++
+/**
+ * Cycle Detection: Given four points of the square-shape subgraph, return true if there
+ * is a cycle path inside the square, false otherwise.
+ * 
+ * @param {std::vector<double>} square: four vertexes of the square area
+ * @return {bool}: whether there is a cycle or not
+ */
 bool CycleDetection(std::vector<double> &square);
 ```
 
-In this section, we use a square-shaped subgraph of the original graph by using four coordinates stored in ```std::vector<double> square```, which follows the order of left, right, upper, and lower bounds. 
+I use a square-shaped subgraph of the original graph by using four coordinates stored in ```std::vector<double> square```, which follows the order of left, right, upper, and lower bounds. Then I determine if there is a cycle path in the that subgraph. If it does, return true and report that path on the map. Otherwise return false.
 
-Then try to determine if there is a cycle path in the that subgraph. If it does, return true and report that path on the map. Otherwise return false.
+<p align="center"><img src="img/step5.PNG" alt="step5" width="550"/></p>
 
-Example 1:
+Time complexity: **O(m+n)**, n is the number of location ids in the data, m is the number of edges.
+
+Example1: If there is **a cycle** in the map, the function will **plot the first cycle** it meets.
+
 ```shell
-Input: square = {-118.299, -118.264, 34.032, 34.011}
-Output: true
+7
+**************************************************************
+* 7. Cycle Detection                                          
+**************************************************************
+Please input the left bound longitude(between -118.299 and -118.264):-118.299
+Please input the right bound longitude(between -118.299 and -118.264):-118.264
+Please input the upper bound latitude(between 34.011 and 34.032):34.032
+Please input the lower bound latitude(between 34.011 and 34.032):34.011
+*************************Results******************************
+there exists cycle in the subgraph 
+**************************************************************
+Time taken by function: 69146 microseconds
 ```
-Here we use the whole original graph as our subgraph. 
-<p align="center"><img src="img/cycle1.png" alt="TSP" width="500"/></p>
 
-Example 2:
-```shell
-Input: square = {-118.290919, -118.282911, 34.02235, 34.019675}
-Output: false
-```
-Here we use a square area inside USC campus as our subgraph
-<p align="center"><img src="img/cycle2.png" alt="TSP" width="500"/></p>
+<p align="center"><img src="img/cycle1.PNG" alt="cycle1" width="550"/></p>
 
-Note: You could use the function below to visualize the subgraph. 
+Example 2: If there is **no cycle** in the map, the function will **plot the subgraph**.
+
+I use the function below to visualize the subgraph.
 
 ```c++
 /**
@@ -341,26 +582,12 @@ Note: You could use the function below to visualize the subgraph.
  */
 void TrojanMap::PlotPointsandEdges(std::vector<std::string> &location_ids, std::vector<double> &square)
 ```
+Here I use a square area inside USC campus as our subgraph
 ```shell
-5
+7
 **************************************************************
-* 5. Cycle Detection                                          
+* 7. Cycle Detection                                          
 **************************************************************
-
-Please input the left bound longitude(between -118.299 and -118.264):-118.299
-Please input the right bound longitude(between -118.299 and -118.264):-118.264
-Please input the upper bound latitude(between 34.011 and 34.032):34.032
-Please input the lower bound latitude(between 34.011 and 34.032):34.011
-*************************Results******************************
-there exists cycle in the subgraph 
-**************************************************************
-Time taken by function: 273734 microseconds
-
-5
-**************************************************************
-* 5. Cycle Detection                                          
-**************************************************************
-
 Please input the left bound longitude(between -118.299 and -118.264):-118.290919
 Please input the right bound longitude(between -118.299 and -118.264):-118.282911
 Please input the upper bound latitude(between 34.011 and 34.032):34.02235
@@ -368,11 +595,21 @@ Please input the lower bound latitude(between 34.011 and 34.032):34.019675
 *************************Results******************************
 there exist no cycle in the subgraph 
 **************************************************************
-Time taken by function: 290371 microseconds
+Time taken by function: 70494 microseconds
 ```
+<p align="center"><img src="img/cycle2.PNG" alt="cycle2" width="550"/></p>
+
 ## Step 6: Topological Sort
 
 ```c++
+/**
+ * DeliveringTrojan: Given a vector of location names, it should return a sorting of nodes
+ * that satisfies the given dependencies.
+ *
+ * @param  {std::vector<std::string>} locations                     : locations
+ * @param  {std::vector<std::vector<std::string>>} dependencies     : prerequisites
+ * @return {std::vector<std::string>} results                       : results
+ */
 std::vector<std::string> DeliveringTrojan(std::vector<std::string> &location_names,
                                             std::vector<std::vector<std::string>> &dependencies);
 ```
@@ -380,8 +617,6 @@ std::vector<std::string> DeliveringTrojan(std::vector<std::string> &location_nam
 Tommy Trojan got a part-time job from TrojanEats, for which he needs to pick up and deliver food from local restaurants to various location near the campus. Tommy needs to visit a few different location near the campus with certain order, since there are some constraints. For example, he must first get the food from the restaurant before arriving at the delivery point. 
 
 The TrojanEats app will have some instructions about these constraints. So, Tommy asks you to help him figure out the feasible route!
-
-Here we will give you a vector of location names that Tommy needs to visit, and also some dependencies between those locations.
 
 
 For example, 
@@ -392,8 +627,7 @@ location_names = {"Cardinal Gardens", "Coffee Bean1", "CVS"}
 dependencies = {{"Cardinal Gardens","Coffee Bean1"}, {"Cardinal Gardens","CVS"}, {"Coffee Bean1","CVS"}}
 ```
 
-Here, ```{"Cardinal Gardens","Coffee Bean1"}``` means
-that Tommy must go to `Cardinal Gardens` prior to `Coffee Bean1`.
+Here, ```{"Cardinal Gardens","Coffee Bean1"}``` means that Tommy must go to `Cardinal Gardens` prior to `Coffee Bean1`.
 
 Your output should be:
 ```shell
@@ -401,76 +635,38 @@ Output: Cardinal Gardens -> Coffee Bean1 -> CVS
 ```
 Also, we provide ```PlotPointsOrder``` function that can visualize the results on the map. It will plot each location name and also some arrowed lines to demonstrate a feasible route.
 
-If no feasible route exists, you could simply return an empty vector.
+<p align="center"><img src="img/step6.PNG" alt="step6" width="500"/></p>
 
-Hint:
-- You also need to finish ```ReadLocationsFromCSVFile``` and ```ReadDependenciesFromCSVFile``` functions, so you could read and parse data from you own CSV files. We also give two sample CSV files under ```input``` folder, which could be a reference. 
-- When it asks you filenames, you need to give the absolute path.
-- If you do not have ```ReadLocationsFromCSVFile``` and ```ReadDependenciesFromCSVFile``` functions ready yet, you can just press enter when it asks you filenames. It will call the default locations and dependencies.
-- The locations are actually nodes, and the dependencies could be directed edges. You may want to first construct a DAG and then implement topological sort algorithm to get the route.
+Time complexity: **O(m+n)**, n is the number of location ids in the data, m is the number of edges.
 
 ```shell
-6
+8
+**************************************************************
+* 8. Topological Sort                                         
+**************************************************************
+Please input the locations filename:/home/student/Desktop/final-project-YTqth0921/input/topologicalsort_locations.csv
+Please input the dependencies filename:/home/student/Desktop/final-project-YTqth0921/input/topologicalsort_dependencies.csv
 *************************Results******************************
-Topological Sorting Results:
+Topological Sorting Reults:
+University Park
+Kentucky Fried Chicken
 Cardinal Gardens
 Coffee Bean1
 CVS
 **************************************************************
-Time taken by function: 43 microseconds
+Time taken by function: 753005 microseconds
+
 ```
-<p align="center"><img src="img/TopologicalSort.png" alt="TSP" width="500"/></p>
+<p align="center"><img src="img/TS.PNG" alt="TS" width="550"/></p>
 
-In the user interface, we read the locations and dependencies from `topologicalsort_dependencies.csv` and `topologicalsort_locations.csv` to modify your input there.
+**Discussion**: If **no feasible route exists** or **there is a cycle in the path**, I simply return an empty vector. I have written these two case in my [trojanmap_test_student.cc](src/tests/trojanmap_test_student.cc). 
 
-## Reporting Runtime:
-For each menu item, your program should show the time it took to finish each task.
+### Conclusion & Lessons learned:
 
-## Report and Rubrics:
+1. As a javascript developer, learning C++ in this course strengthen my understanding of memory.
+2. Pay attention to write test cases, keep a good habit of handwriting corner cases.
+3. This project is a comprehensive practice of what we have learnt in this course. I have learned the theory of Dijkstra in EE450 computer networking, I finally get the opportunity to write this algorithm by myself. The other steps also deepens my understanding of graph algorithms. 
+4. After taking this course, I comprehensively understand common algorithms (sort, search, recursion, dynamic programming, backtracking) and data structures (map, set, heap, tree, hash, lists, graphs).
 
-Your final project should be checked into Github. The README of your project is your report. 
 
-### Report:
-
-Your README file should include two sections:
-
-1. High-level overview of your design (Use diagrams and pictures for your data structures).
-2. Detailed description of each function and its time complexity.
-3. Time spent for each function.
-4. Discussion, conclusion, and lessons learned.
-
-### Rubrics:
-
-1. Implementation of auto complete: 10 points.
-2. Implementation of GetPosition: 5 points.
-3. Implementation of shortest path: 20 points.
-   1. Bellman-Ford implementation
-   2. Dijkstra implementation
-   3. Plot two paths, and measure and report time spent by two algorithms.
-4. Implementation of Travelling Trojan: 
-   1. Brute Force: 10 points.
-   2. 2-opt: 10 points.
-   3. Animated plot: 5 points.
-4. Implement of Cycle detection: 10 points.
-   1. Boolean value and draw the cycle if there exists one.
-5. Topological Sort: 10 points.
-   1. Check whether there exist a topological sort or not
-   2. Return the correct order and plot those point on the map
-6. Creating reasonable unit tests: 10 points.
-   1. Three different unit tests for each item.
-7. Video presentation and report: 10 points.
-
-8. **Extra credit items**: Maximum of 20 points:
-   1. [3-opt](http://cs.indstate.edu/~zeeshan/aman.pdf): 10 points.
-   2. [Genetic algorithm](https://www.geeksforgeeks.org/traveling-salesman-problem-using-genetic-algorithm/) implementation for Travelling Trojan: 10 points
-   3. Create dynamic and animated UI using [ncurses](https://en.wikipedia.org/wiki/Ncurses): 10 points
-      - You could check https://github.com/ourarash/ncurses_bazel
-      - Please develope your own UI.
-      - example
-<p align="center"><img src="img/ncurses example.gif" alt="example" width="500"/></p>
-   Note: For Ubuntu, you main need to use the following command to prevent errors.
-   
-   ```shell
-   $ bazel run --cxxopt='-std=c++17' src/main:main
-   ```
 

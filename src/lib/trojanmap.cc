@@ -703,7 +703,7 @@ std::vector<std::string> TrojanMap::Autocomplete(std::string name){
   transform(name.begin(),name.end(),name.begin(),::tolower);
   std::string prefix;
   for(auto pair: data) {
-    // If the size of input is greater than the size of node’s name, skip this node;
+    // If the size of input is greater than the size of node’s name, skip this node
     if (name.size() < pair.second.name.size()){
       prefix = pair.second.name.substr(0, name.size());
       transform(prefix.begin(),prefix.end(),prefix.begin(),::tolower);
@@ -876,13 +876,13 @@ std::vector<std::string> TrojanMap::CalculateShortestPath_Bellman_Ford(std::stri
 std::vector<std::string> TrojanMap::ReadLocationsFromCSVFile(std::string locations_filename){
   fstream fin;
   fin.open(locations_filename, ios::in);
-  string line, word;
+  std::string line, word;
   std::vector<std::string> location_names_from_csv;
 
   getline(fin, line);
   while(getline(fin, line)) { 
     stringstream s(line);
-    string location;
+    std::string location;
     getline(s, location, ',');
     location_names_from_csv.push_back(location);
   }
@@ -906,8 +906,8 @@ std::vector<std::vector<std::string>> TrojanMap::ReadDependenciesFromCSVFile(std
   getline(fin, line);
   while(getline(fin, line)) { 
     stringstream s(line);
-    vector<string> locations;
-    string location;
+    std::vector<string> locations;
+    std::string location;
     while(getline(s, location, ',')) {
       locations.push_back(location);
     }
