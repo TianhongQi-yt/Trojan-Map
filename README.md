@@ -136,7 +136,7 @@ std::pair<double, double> GetPosition(std::string name);
 
  There are no duplicated location names. I mark the given locations on the map. If the location does not exist, return (-1, -1).
 
-<p align="center"><img src="img/step2.PNG" alt="step2" width="550" /></p>
+<p align="center"><img src="img/step2.PNG" alt="step2" width="450" /></p>
 
 Time complexity: **O(n)**, n is the number of location ids in the data.
 
