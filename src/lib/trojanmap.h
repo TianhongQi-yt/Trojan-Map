@@ -129,8 +129,8 @@ class TrojanMap {
   // vector square has 4 elements: left/right/top/bottom bound in order.
   bool CycleDetection(std::vector<double> &square);
   
-  //----------------------------------------------------- User-defined functions
-
+  //----------------------------------------------------- User-defined functions 
+  std::string GetId(std::string name);
   bool hasCycle(std::string cur, std::string parent, std::map<std::string, bool> &visited, std::vector<std::string> &cycle_path);
 };
 

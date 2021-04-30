@@ -82,7 +82,17 @@
     "future": "cpp",
     "forward_list": "cpp",
     "queue": "cpp",
-    "clocale": "cpp"
+    "clocale": "cpp",
+    "*.tcc": "cpp",
+    "cfenv": "cpp",
+    "csetjmp": "cpp",
+    "csignal": "cpp",
+    "rope": "cpp",
+    "slist": "cpp",
+    "scoped_allocator": "cpp",
+    "shared_mutex": "cpp",
+    "typeindex": "cpp",
+    "valarray": "cpp"
   },
   "lldb.displayFormat": "auto",
   "lldb.dereferencePointers": true,

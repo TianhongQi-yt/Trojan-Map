@@ -682,6 +682,7 @@ double TrojanMap::CalculateDistance(const Node &a, const Node &b) {
  * @return {double}                        : path length
  */
 double TrojanMap::CalculatePathLength(const std::vector<std::string> &path) {
+  if(path.empty()) return 0;
   double sum = 0;
   for(int i = 0; i < path.size()-1; i++){
     sum += CalculateDistance(data[path[i]], data[path[i+1]]);
@@ -698,10 +699,11 @@ double TrojanMap::CalculatePathLength(const std::vector<std::string> &path) {
  */
 std::vector<std::string> TrojanMap::Autocomplete(std::string name){
   std::vector<std::string> results;
+  if(name.empty()) return results;
   transform(name.begin(),name.end(),name.begin(),::tolower);
   std::string prefix;
   for(auto pair: data) {
-    // If the size of input is greater than the size of node’s name, we skip this node;
+    // If the size of input is greater than the size of node’s name, skip this node;
     if (name.size() < pair.second.name.size()){
       prefix = pair.second.name.substr(0, name.size());
       transform(prefix.begin(),prefix.end(),prefix.begin(),::tolower);
@@ -720,6 +722,7 @@ std::vector<std::string> TrojanMap::Autocomplete(std::string name){
  */
 std::pair<double, double> TrojanMap::GetPosition(std::string name) {
   std::pair<double, double> results(-1, -1);
+  if(name.empty()) return results;
   for(auto pair: data) {
     // If we find this node’s name, return its position;
     if(pair.second.name == name) {
@@ -748,6 +751,15 @@ Node TrojanMap::GetNode(std::string name) {
   return n;
 }
 
+std::string TrojanMap::GetId(std::string name) {
+  for (auto pair :data) {
+    if (pair.second.name == name) {
+      return pair.first;
+    }
+  }
+  return "";
+}
+
 /**
  * CalculateShortestPath_Dijkstra: Given 2 locations, return the shortest path which is a
  * list of id.
@@ -757,27 +769,33 @@ Node TrojanMap::GetNode(std::string name) {
  * @return {std::vector<std::string>}       : path
  */
 std::vector<std::string> TrojanMap::CalculateShortestPath_Dijkstra(std::string location1_name, std::string location2_name) {
-  // Get start and end node from point’s name
-  Node start = GetNode(location1_name);
-  Node end = GetNode(location2_name);
+  // Get start and end node from location name
+  std::string start = GetId(location1_name);
+  std::string end = GetId(location2_name);
   // Create a min heap using priority queue with pair of <distance, id>
   std::priority_queue<std::pair<double, std::string>, std::vector<std::pair<double, std::string>>, 
   std::greater<std::pair<double, std::string>>> q;
   // Use a map to save the shortest distance of each node
   std::map<std::string, double> d;
+  // Use another map to save the predecessor of each node
+  std::map<std::string, std::string> p;
+  // Generate path based on the predecessor map
+  std::vector<std::string> path;
+  // If there is an invalid input
+  if(start == "" || end == "") return path;
   for (auto pair: data){
     d[pair.second.id] = DBL_MAX;
   }
-  d[start.id] = 0;
-  // Use another map to save the predecessor of each node
-  std::map<std::string, std::string> p;
-  q.push(make_pair(0, start.id));
+  d[start] = 0;
+
+  bool is_end_visited = false;
+  q.push(make_pair(0, start));
   while(!q.empty()){
     // find the shortest distance node
     std::string cur = q.top().second;
     q.pop();
     // current node is not the end node
-    if (cur != end.id){
+    if(cur != end){
       for (auto neighbor: data[cur].neighbors){
         double neighbor_dis = CalculateDistance(data[cur], data[neighbor]);
         if(d[neighbor] > d[cur] + neighbor_dis){
@@ -786,14 +804,17 @@ std::vector<std::string> TrojanMap::CalculateShortestPath_Dijkstra(std::string l
           q.push(make_pair(d[neighbor], neighbor));
         }
       } 
-    }
+    }else{
+      is_end_visited = true;
+      break;
+    } 
   }
-  // Generate path 
-  std::vector<std::string> path;
-  for (auto pre = end.id; pre != start.id; pre = p[pre]){
+  // If the end node is not visited, there is no path
+  if(!is_end_visited) return path;
+  for (auto pre = end; pre != start; pre = p[pre]){
     path.push_back(pre);
   }
-  path.push_back(start.id);
+  path.push_back(start);
   std::reverse(path.begin(), path.end());
   return path;
 }
@@ -807,17 +828,21 @@ std::vector<std::string> TrojanMap::CalculateShortestPath_Dijkstra(std::string l
  * @return {std::vector<std::string>}       : path
  */
 std::vector<std::string> TrojanMap::CalculateShortestPath_Bellman_Ford(std::string location1_name, std::string location2_name){
-  // Get start and end node from point’s name
-  Node start = GetNode(location1_name);
-  Node end = GetNode(location2_name);
-    // Use a map to save the shortest distance of each node
+  // Get start and end node from location name
+  std::string start = GetId(location1_name);
+  std::string end = GetId(location2_name);
+  // Use another map to save the predecessor of each node
+  std::map<std::string, std::string> p;
+  // Use a map to save the shortest distance of each node
   std::map<std::string, double> d;
+  // Generate path based on the predecessor map
+  std::vector<std::string> path;
+  // If there is an invalid input
+  if(start == "" || end == "") return path;
   for (auto pair: data){
     d[pair.second.id] = DBL_MAX;
   }
-  d[start.id] = 0;
-  // Use another map to save the predecessor of each node
-  std::map<std::string, std::string> p;
+  d[start] = 0;
 
   for (int i = 0; i < data.size()-1; i++){
     for (auto pair: data){
@@ -831,11 +856,12 @@ std::vector<std::string> TrojanMap::CalculateShortestPath_Bellman_Ford(std::stri
       }
     }
   }
-  std::vector<std::string> path;
-  for (auto pre = end.id; pre != start.id; pre = p[pre]){
+
+  if (d[end] == DBL_MAX) return path;
+  for (auto pre = end; pre != start; pre = p[pre]){
     path.push_back(pre);
   }
-  path.push_back(start.id);
+  path.push_back(start);
   std::reverse(path.begin(), path.end());
   return path;
 }
@@ -902,9 +928,9 @@ std::vector<std::vector<std::string>> TrojanMap::ReadDependenciesFromCSVFile(std
 void DFS(std::string root, std::map<std::string, bool> &visited, std::vector<std::string> &result, 
         std::unordered_map<std::string, std::vector<std::string>> &edge_map){
   visited[root] = true;
-  for(auto child: edge_map[root]){
-    if(visited[child] == false){
-      DFS(child, visited, result, edge_map);
+  for(auto dep: edge_map[root]){
+    if(!visited[dep]){
+      DFS(dep, visited, result, edge_map);
     }
   }
   result.push_back(root);
@@ -912,11 +938,19 @@ void DFS(std::string root, std::map<std::string, bool> &visited, std::vector<std
 
 std::vector<std::string> TrojanMap::DeliveringTrojan(std::vector<std::string> &locations, 
                                                     std::vector<std::vector<std::string>> &dependencies){
+  // Invalid input case                                                     
+  if(locations.size() <= 1){
+    std::vector<std::string> path;
+    return path;
+  } 
+  // The vector to save the result path
   std::vector<std::string> result;
+  // The vector to save all the root nodes(with the most dependencies)
   std::vector<std::string> roots;
+  // The map to record if the current node is visited
   std::map<std::string, bool> visited;
   int deps = 0;
-  // Defined In Directed Acyclic Graphs (DAG)
+  // Defined the Directed Acyclic Graphs (DAG) based on dependencies
   std::unordered_map<std::string, std::vector<std::string>> edge_map;
   for(auto location: locations){
     std::vector<std::string> temp;
@@ -926,13 +960,11 @@ std::vector<std::string> TrojanMap::DeliveringTrojan(std::vector<std::string> &l
   for(auto dep: dependencies){
     edge_map[dep[0]].push_back(dep[1]);
   }
-  
   for(auto pair: edge_map){
     if(pair.second.size() > deps){
       deps = pair.second.size();
     }
   }
-
   for(auto pair: edge_map){
     if(pair.second.size() == deps){
       roots.push_back(pair.first);
@@ -941,6 +973,10 @@ std::vector<std::string> TrojanMap::DeliveringTrojan(std::vector<std::string> &l
   // Run DFS for each root node
   for(auto root: roots){
     DFS(root, visited, result, edge_map);
+  }
+  if(result.size() != locations.size()){
+    std::vector<std::string> empty_path;
+    return empty_path;
   }
   std::reverse(result.begin(), result.end());
   // PlotPointsOrder(result); // I comment this plot function to avoid the openCV error 
@@ -956,6 +992,11 @@ std::vector<std::string> TrojanMap::DeliveringTrojan(std::vector<std::string> &l
  */
 std::pair<double, std::vector<std::vector<std::string>>> TrojanMap::TravellingTrojan(std::vector<std::string> &location_ids) {
   std::pair<double, std::vector<std::vector<std::string>>> results;
+  // Invalid input case
+  if(location_ids.size() <= 1){
+    std::vector<std::vector<std::string>> path;
+    return make_pair(0, path);
+  } 
   double min_length = DBL_MAX;
   std::vector<std::string> temp;
   // Create a vector to save current path ids
@@ -988,7 +1029,7 @@ std::pair<double, std::vector<std::vector<std::string>>> TrojanMap::TravellingTr
 
 std::vector<std::string> twoOptSwap(const std::vector<std::string> &route, int i, int k) {
   std::vector<std::string> res(route);
-  std::reverse(res.begin()+i,res.begin()+k+1);
+  std::reverse(res.begin() + i, res.begin() + k + 1);
   return res;
 }
 
@@ -1075,7 +1116,6 @@ bool TrojanMap::CycleDetection(std::vector<double> &square) {
       bool cycle = hasCycle(id, parent, visited, cycle_path);
       // If there is a cycle, plot it.
       if(cycle){
-        // If there is a cycle, plot it.
         // PlotPath(cycle_path); // I comment this plot function to avoid the openCV error 
         return true;
       }
