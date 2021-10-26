@@ -1,8 +1,6 @@
-# EE599 Final Project - Spring 2021 - TrojanMap
+# TrojanMap
 
 ## Author: Tianhong Qi
-
-## TrojanMap
 
 This project focuses on using data structures in C++ and implementing various graph algorithms to build a map application.
 
@@ -660,13 +658,4 @@ Time taken by function: 753005 microseconds
 <p align="center"><img src="img/TS.PNG" alt="TS" width="550"/></p>
 
 **Discussion**: If **no feasible route exists** or **there is a cycle in the path**, I simply return an empty vector. I have written these two case in my [trojanmap_test_student.cc](src/tests/trojanmap_test_student.cc). 
-
-### Conclusion & Lessons learned:
-
-1. As a javascript developer, learning C++ in this course strengthen my understanding of memory.
-2. Pay attention to write test cases, keep a good habit of handwriting corner cases.
-3. This project is a comprehensive practice of what we have learnt in this course. I have learned the theory of Dijkstra in EE450 computer networking, I finally get the opportunity to write this algorithm by myself. The other steps also deepens my understanding of graph algorithms. 
-4. After taking this course, I comprehensively understand common algorithms (sort, search, recursion, dynamic programming, backtracking) and data structures (map, set, heap, tree, hash, lists, graphs).
-
-
 
